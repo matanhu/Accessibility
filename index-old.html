@@ -1,0 +1,78 @@
+<!DOCTYPE HTL>
+
+<html>
+    <head>
+    </head>
+    <body>
+        <canvas id="c" width="800" height="500"></canvas>
+        
+        <div>
+            <img id="imgTest" src="imgTest.jpg" width="800" height="500"/> 
+        </div>
+        <script>
+            var c = document.querySelector("#c");
+            var imageTest = document.getElementById('imgTest')
+            var ctx = c.getContext("2d");
+
+            var img = new Image();
+            img.onload = function() {
+                console.log("Loaded Image");
+                ctx.drawImage(img, 0, 0, c.width, c.height);
+
+                grayScale();
+                unGrayScale();
+                // invertColorToggle();
+                
+            }
+
+            var grayScale = function() {
+                var imageData = ctx.getImageData(0, 0, c.width, c.height);
+                var px = imageData.data;
+
+                var len = px.length;
+
+                for (var i = 0; i < len; i+=4) {
+                    var redPx = px[i];
+                    var greenPx = px[i+1];
+                    var bluePx = px[i+2];
+                    var alphaPx = px[i+3];
+
+                    var greyScale = redPx * .3 + greenPx * .59 + bluePx * .11;
+
+                    px[i] = greyScale;
+                    px[i+1] = greyScale;
+                    px[i+2] = greyScale;
+                    // px[i+3] = greyScale;
+                    
+                }
+
+                ctx.putImageData(imageData, 0, 0);
+                imageTest.src = ctx.canvas.toDataURL();
+            }
+
+            var unGrayScale = function() {
+                ctx.drawImage(img, 0, 0, c.width, c.height);
+            }
+
+            var invertColorToggle = function() {
+                var imageData = ctx.getImageData(0, 0, c.width, c.height);
+                var px = imageData.data;
+
+                var len = px.length;
+
+                for (var i = 0; i < len; i+=4) {
+                    px[i] = 255 - px[i];
+                    px[i+1] = 255 - px[i+1];
+                    px[i+2] = 255 - px[i+2];
+                    // px[i+3] = 255 - px[i+3];
+                    // px[i+3] = greyScale;
+                    
+                }
+
+                ctx.putImageData(imageData, 0, 0);
+            }
+            
+            img.src = imageTest.src;
+        </script>
+    </body>
+</html>

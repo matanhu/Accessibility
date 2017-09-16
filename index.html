@@ -1,0 +1,112 @@
+<!DOCTYPE HTL>
+
+<html>
+    <head>
+            <script
+            src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g="
+            crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <!-- <canvas id="c" width="800" height="500"></canvas> -->
+        
+        <div>
+            <img id="imgTest" src="imgTest.jpg" width="800" height="500"/> 
+        </div>
+        <div>
+            <div style="padding:500px 800px; background-image:url('imgTest1.jpg'); background-repeat: no-repeat; background-size: cover;">
+            </div>
+        </div>
+
+
+        <script>
+            $(document).ready(function() {
+                $('*').each(function() {
+                    if($(this).is('img') || $(this).css('backgroundImage') != 'none'){
+                        console.log(this);
+                        createImageCanvas(this);
+                    }
+                });
+            });
+
+            var createImageCanvas = function(imgDom) {
+                var c = document.createElement("canvas");
+                c.width = imgDom.offsetWidth;
+                c.height = imgDom.offsetHeight;
+                // var imageTest = document.getElementById('imgTest');
+                var imageTest = imgDom;
+                var ctx = c.getContext("2d");
+
+                var img = new Image();
+                img.onload = function() {
+                    console.log("Loaded Image");
+                    ctx.drawImage(img, 0, 0, c.width, c.height);
+
+                    grayScale(imgDom, ctx);
+                    // unGrayScale();
+                    // invertColorToggle();
+                    
+                }
+                if($(imgDom).is('img')) {
+                    img.src = imgDom.src;
+                } else {
+                    var url = $(imgDom).css('backgroundImage').replace(/^url\(\"|[\"\)]/g, '');
+                    img.setAttribute('src', url);
+                }
+            }
+            var grayScale = function(imgDom, ctx) {
+                var imageData = ctx.getImageData(0, 0, imgDom.offsetWidth, imgDom.offsetHeight);
+                var px = imageData.data;
+
+                var len = px.length;
+
+                for (var i = 0; i < len; i+=4) {
+                    var redPx = px[i];
+                    var greenPx = px[i+1];
+                    var bluePx = px[i+2];
+                    var alphaPx = px[i+3];
+
+                    var greyScale = redPx * .3 + greenPx * .59 + bluePx * .11;
+
+                    px[i] = greyScale;
+                    px[i+1] = greyScale;
+                    px[i+2] = greyScale;
+                    // px[i+3] = greyScale;
+                    
+                }
+
+                ctx.putImageData(imageData, 0, 0);
+                if($(imgDom).is('img')) {
+                    imgDom.src = ctx.canvas.toDataURL();
+                } else {
+                    $(imgDom).css('backgroundImage', 'url("' + ctx.canvas.toDataURL() + '")');
+                }
+                
+            }
+
+            var unGrayScale = function() {
+                ctx.drawImage(img, 0, 0, c.width, c.height);
+            }
+
+            var invertColorToggle = function() {
+                var imageData = ctx.getImageData(0, 0, c.width, c.height);
+                var px = imageData.data;
+
+                var len = px.length;
+
+                for (var i = 0; i < len; i+=4) {
+                    px[i] = 255 - px[i];
+                    px[i+1] = 255 - px[i+1];
+                    px[i+2] = 255 - px[i+2];
+                    // px[i+3] = 255 - px[i+3];
+                    // px[i+3] = greyScale;
+                    
+                }
+
+                ctx.putImageData(imageData, 0, 0);
+            }
+            
+            
+        </script>
+    </body>
+</html>
